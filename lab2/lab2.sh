@@ -18,7 +18,7 @@ ldd a.out
 
 cp ../tests/tests.c .
 export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/:$(pwd)"
-echo $LD_LIBRARY_PATH
+# echo $LD_LIBRARY_PATH
 gcc tests.c -lcunit -L. -lrevert_string
 ./a.out
 
