@@ -8,7 +8,6 @@ cd revert_string
 gcc -c revert_string.c -o revert_string.o
 ar cr librevert_string.a revert_string.o
 gcc -static main.c -L. -lrevert_string
-ldd a.out
 ./a.out "abcd"
 
 gcc -fPIC -c revert_string.c -o revert_string.o
