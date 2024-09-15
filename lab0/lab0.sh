@@ -13,6 +13,7 @@ echo "*.o\n*.so\n*.out\n*.a" > ../../../.gitignore
 git add ../../../.gitignore
 git commit -m "update gitignore"
 
+cd ~/Documents/os_lab_2024
 git add .
 git commit -m "добавлен hello.c и empty"
 git push

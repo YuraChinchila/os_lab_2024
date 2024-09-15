@@ -11,6 +11,7 @@ echo $PATH
 od -N150 -t d4 < /dev/random > numbers.txt
 cat numbers.txt | ./average.sh `xargs`
 
+cd ~/Documents/os_lab_2024
 git add .
 git commit -m "1"
 git push

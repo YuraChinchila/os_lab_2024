@@ -6,8 +6,8 @@ gcc swap/main.c swap/swap.c
 echo "==========2/3=========="
 cd revert_string
 gcc -c revert_string.c -o revert_string.o
-ar r librevert_string.a revert_string.o
-gcc main.c librevert_string.a
+ar cr librevert_string.a revert_string.o
+gcc -static main.c -L. -lrevert_string
 ./a.out "abcd"
 
 gcc -fPIC -c revert_string.c -o revert_string.o
@@ -19,6 +19,7 @@ ldd a.out
 ./a.out "dcba"
 cd ..
 
+cd ~/Documents/os_lab_2024
 git add .
 git commit -m "2"
 git push
