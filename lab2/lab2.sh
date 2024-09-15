@@ -1,9 +1,9 @@
 cd ~/Documents/os_lab_2024/lab2/src
-echo "==========1=========="
+echo "==========1==========\n"
 gcc swap/main.c swap/swap.c
 ./a.out
 
-echo "==========2/3=========="
+echo "\n==========2/3==========\n"
 cd revert_string
 gcc -c revert_string.c -o revert_string.o
 ar cr librevert_string.a revert_string.o
@@ -16,7 +16,7 @@ gcc main.c -L. -lrevert_string -Wl,-rpath,.
 ldd a.out
 ./a.out "dcba"
 
-echo "==========4=========="
+echo "\n==========4==========\n"
 cp ../tests/tests.c .
 export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/:$(pwd)"
 # echo $LD_LIBRARY_PATH
