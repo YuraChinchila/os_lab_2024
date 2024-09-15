@@ -16,6 +16,7 @@ gcc main.c -L. -lrevert_string -Wl,-rpath,.
 ldd a.out
 ./a.out "dcba"
 
+echo "==========4=========="
 cp ../tests/tests.c .
 export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/:$(pwd)"
 # echo $LD_LIBRARY_PATH
