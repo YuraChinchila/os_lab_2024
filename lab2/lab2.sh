@@ -12,12 +12,17 @@ gcc -static main.c -L. -lrevert_string
 
 gcc -fPIC -c revert_string.c -o revert_string.o
 gcc -shared revert_string.o -o librevert_string.so
-p="$(pwd)"
-gcc main.c -L$p -lrevert_string
-export LD_LIBRARY_PATH=$p
+gcc main.c -L. -lrevert_string -Wl,-rpath,.
 ldd a.out
 ./a.out "dcba"
-cd ..
+
+cp ../tests/tests.c .
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/:$(pwd)"
+echo $LD_LIBRARY_PATH
+gcc tests.c -lcunit -L. -lrevert_string
+./a.out
+
+ls /bin | grep libsimple
 
 cd ~/Documents/os_lab_2024
 git add .
