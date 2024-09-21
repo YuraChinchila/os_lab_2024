@@ -23,7 +23,7 @@ export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu/:$(pwd)"
 gcc tests.c -lcunit -L. -lrevert_string
 ./a.out
 
-ls /bin | grep libsimple
+# ls /bin | grep libsimple
 
 cd ~/Documents/os_lab_2024
 git add .
