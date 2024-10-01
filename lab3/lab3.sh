@@ -3,6 +3,22 @@ echo "==========1=========="
 gcc find_min_max.c test1.c
 ./a.out
 
-# git add .
-# git commit -m "3"
-# git push
+echo "==========2/3=========="
+gcc -o parallel_min_max utils.c find_min_max.c parallel_min_max.c
+./parallel_min_max --seed 42 --array_size 100 --pnum 3
+./parallel_min_max --seed 42 --array_size 100 --pnum 3 --by_files
+
+echo "==========4=========="
+make clean
+make
+./sequential_min_max 42 100
+./parallel_min_max --seed 42 --array_size 100 --pnum 3
+
+echo "==========5=========="
+make exec
+./exec
+
+cd ../..
+git add .
+git commit -m "3"
+git push

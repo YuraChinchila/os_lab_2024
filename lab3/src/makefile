@@ -17,7 +17,7 @@ find_min_max.o : utils.h find_min_max.h
 	$(CC) -o find_min_max.o -c find_min_max.c $(CFLAGS)
 
 exec.o :
-	$(CC) -o exec.o -c exec.cpp
+	$(CC) -o exec.o -c exec.c
 
 exec : exec.o sequential_min_max
 	$(CC) -o exec exec.o
