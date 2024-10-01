@@ -15,6 +15,11 @@
 #include "find_min_max.h"
 #include "utils.h"
 
+typedef union {
+    int a;
+    char c[4];
+} char_int;
+
 int main(int argc, char **argv) {
     int seed = -1;
     int array_size = -1;
@@ -84,14 +89,24 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    int *array = malloc(sizeof(int) * array_size);
+    int* array = (int*)malloc(sizeof(int) * array_size);
     GenerateArray(array, array_size, seed);
     int active_child_processes = 0;
 
     struct timeval start_time;
     gettimeofday(&start_time, NULL);
+    
+    int p[2];
+    FILE* pf = NULL;
+    if (with_files) {
+        pf = fopen("pipe.txt", "w");
+    } else {
+        if (pipe(p) == -1) {
+            return 1;
+        }
+    }
 
-    for (int _ = 0; _ < pnum; _++) {
+    for (int pi = 0; pi < pnum; pi++) {
         pid_t child_pid = fork();
         if (child_pid >= 0) {
             // successful fork
@@ -99,11 +114,25 @@ int main(int argc, char **argv) {
             if (child_pid == 0) {
                 // child process
                 // parallel somehow
-
+                struct MinMax min_max;
+                min_max.min = INT_MAX;
+                min_max.max = INT_MIN;
+                for (int i = pi; i < array_size; i += pnum) {
+                    if (array[i] < min_max.min) {
+                        min_max.min = array[i];
+                    }
+                    if (array[i] > min_max.max) {
+                        min_max.max = array[i];
+                    }        
+                }
                 if (with_files) {
                     // use files here
+                    fwrite(&min_max.min, sizeof(int), 1, pf);
+                    fwrite(&min_max.max, sizeof(int), 1, pf);
                 } else {
                     // use pipe here
+                    write(p[1], &min_max.min, sizeof(int));
+                    write(p[1], &min_max.max, sizeof(int));
                 }
                 return 0;
             }
@@ -112,29 +141,42 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
-
-    while (active_child_processes > 0) {
-        // your code here
-
-        active_child_processes -= 1;
+    wait(NULL);
+    close(p[1]);
+    if (pf != NULL) {
+        fclose(pf);
     }
+    // while (active_child_processes > 0) {
+    //     // your code here
+
+    //     active_child_processes -= 1;
+    // }
 
     struct MinMax min_max;
     min_max.min = INT_MAX;
     min_max.max = INT_MIN;
 
+    pf = fopen("pipe.txt", "r");
     for (int i = 0; i < pnum; i++) {
         int min = INT_MAX;
         int max = INT_MIN;
 
         if (with_files) {
             // read from files
+            fread(&min, 1, sizeof(int), pf);
+            fread(&max, 1, sizeof(int), pf);
         } else {
             // read from pipes
+            read(p[0], &min, sizeof(int));
+            read(p[0], &max, sizeof(int));
         }
 
         if (min < min_max.min) min_max.min = min;
         if (max > min_max.max) min_max.max = max;
+    }
+    close(p[0]);
+    if (pf != NULL) {
+        fclose(pf);
     }
 
     struct timeval finish_time;

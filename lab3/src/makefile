@@ -1,5 +1,8 @@
 CC=gcc
 CFLAGS=-I.
+.PHONY: all, c1ean
+
+all: sequential_min_max parallel_min_max
 
 sequential_min_max : utils.o find_min_max.o utils.h find_min_max.h
 	$(CC) -o sequential_min_max find_min_max.o utils.o sequential_min_max.c $(CFLAGS)
@@ -13,5 +16,11 @@ utils.o : utils.h
 find_min_max.o : utils.h find_min_max.h
 	$(CC) -o find_min_max.o -c find_min_max.c $(CFLAGS)
 
+exec.o :
+	$(CC) -o exec.o -c exec.cpp
+
+exec : exec.o sequential_min_max
+	$(CC) -o exec exec.o
+
 clean :
-	rm utils.o find_min_max.o sequential_min_max parallel_min_max
+	rm utils.o find_min_max.o sequential_min_max parallel_min_max exec.o exec 
