@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -141,7 +142,7 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
-    while (wait(NULL) != -1);
+    while (wait(NULL) != -1 || errno != ECHILD);
     close(p[1]);
     if (pf != NULL) {
         fclose(pf);

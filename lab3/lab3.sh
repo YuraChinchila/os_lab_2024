@@ -7,9 +7,8 @@ echo "==========2/3=========="
 gcc -o parallel_min_max utils.c find_min_max.c parallel_min_max.c
 ./parallel_min_max --seed 42 --array_size 100 --pnum 3
 ./parallel_min_max --seed 42 --array_size 100 --pnum 3 --by_files
-time ./sequential_min_max 42 3000
-time ./parallel_min_max --seed 42 --array_size 3000 --pnum 2
-
+# time ./sequential_min_max 42 300000000
+# time ./parallel_min_max --seed 42 --array_size 300000000 --pnum 2
 
 echo "==========4=========="
 make clean
