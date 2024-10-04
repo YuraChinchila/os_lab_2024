@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
-    wait(NULL);
+    while (wait(NULL) != -1);
     close(p[1]);
     if (pf != NULL) {
         fclose(pf);
