@@ -1,6 +1,7 @@
 *
 !/**/
 !*.*
+!makefile
 *.o
 *.so
 *.out
