@@ -17,6 +17,18 @@
 #include "find_min_max.h"
 #include "utils.h"
 
+bool time_flag = false;
+
+void alarm_handler(int) {
+    time_flag = true;
+}
+
+int child_flag = 0;
+
+void child_handler(int) {
+    ++child_flag;
+}
+
 int main(int argc, char **argv) {
     int seed = -1;
     int array_size = -1;
@@ -129,6 +141,8 @@ int main(int argc, char **argv) {
                         min_max.max = array[i];
                     }        
                 }
+                printf("Finished execution [%d]\n", getpid());
+                fflush(stdout);
                 if (with_files) {
                     // use files here
                     fwrite(&min_max.min, sizeof(int), 1, pf);
@@ -147,56 +161,55 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
-    sleep(timeout);
+
+    printf("Parent [%d]\n", getpid());
     for (int i = 0; i < pnum; ++i) {
-        kill(pids[i], SIGKILL);
+        printf("Child: [%d]\n", pids[i]);
     }
-    bool f = false;
-    for (int i = 0, status; i < pnum; ++i) {
-        waitpid(pids[i], &status, 0);
-        if (WIFEXITED(status)) {
-            printf("Child [%d] terminated normally.\n", pids[i]);
-        } else if (WIFSIGNALED(status)) {
-            f = true;
-            printf("Child [%d] was interrupted.\n", pids[i]);
+    fflush(stdout);
+
+    signal(SIGALRM, alarm_handler);
+    signal(SIGCHLD, child_handler);
+    alarm(timeout);
+    pause();
+    
+    if (time_flag) {
+        for (int i = 0, status; i < pnum; ++i) {
+            pid_t pid_res = waitpid(pids[i], &status, WNOHANG);
+            if (pid_res == 0) {
+                kill(pids[i], SIGKILL);
+            }
         }
     }
-    if (f) {
-        return 0;
-    }
-    // while (wait(NULL) != -1 || errno != ECHILD);
-    close(p[1]);
-    if (pf != NULL) {
-        fclose(pf);
-    }
-
+    while (wait(NULL) != -1 || errno != ECHILD);
+    
     struct MinMax min_max;
     min_max.min = INT_MAX;
     min_max.max = INT_MIN;
+    if (!time_flag) {
+        pf = fopen("pipe.txt", "r");
+        for (int i = 0; i < pnum; i++) {
+            int min = INT_MAX;
+            int max = INT_MIN;
 
-    pf = fopen("pipe.txt", "r");
-    for (int i = 0; i < pnum; i++) {
-        int min = INT_MAX;
-        int max = INT_MIN;
+            if (with_files) {
+                // read from files
+                fread(&min, 1, sizeof(int), pf);
+                fread(&max, 1, sizeof(int), pf);
+            } else {
+                // read from pipes
+                read(p[0], &min, sizeof(int));
+                read(p[0], &max, sizeof(int));
+            }
 
-        if (with_files) {
-            // read from files
-            fread(&min, 1, sizeof(int), pf);
-            fread(&max, 1, sizeof(int), pf);
-        } else {
-            // read from pipes
-            read(p[0], &min, sizeof(int));
-            read(p[0], &max, sizeof(int));
+            if (min < min_max.min) min_max.min = min;
+            if (max > min_max.max) min_max.max = max;
         }
-
-        if (min < min_max.min) min_max.min = min;
-        if (max > min_max.max) min_max.max = max;
+        close(p[0]);
+        if (pf != NULL) {
+            fclose(pf);
+        }
     }
-    close(p[0]);
-    if (pf != NULL) {
-        fclose(pf);
-    }
-
     struct timeval finish_time;
     gettimeofday(&finish_time, NULL);
 
@@ -208,6 +221,5 @@ int main(int argc, char **argv) {
     printf("Min: %d\n", min_max.min);
     printf("Max: %d\n", min_max.max);
     printf("Elapsed time: %fms\n", elapsed_time);
-    // fflush(NULL);
     return 0;
 }
