@@ -67,19 +67,12 @@ int main(int argc, char **argv) {
                 switch (option_index) {
                     case 0:
                         seed = atoi(optarg);
-                        // srand(seed);
-                        // your code here
-                        // error handling
                         break;
                     case 1:
                         array_size = atoi(optarg);
-                        // your code here
-                        // error handling
                         break;
                     case 2:
                         threads_num = atoi(optarg);
-                        // your code here
-                        // error handling
                         break;
                     defalut:
                         printf("Index %d is out of options\n", option_index);
