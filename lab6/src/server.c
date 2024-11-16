@@ -23,7 +23,7 @@ struct FactorialArgs {
 uint64_t Factorial(const struct FactorialArgs *args) {
 	uint64_t ans = 1;
 	for (uint64_t i = args->begin; i < args->end; ++i) {
-		ans = (ans * i) % args->mod;
+		ans = MultModulo(ans, i, args->mod);
 	}
 
 	return ans;
@@ -169,7 +169,6 @@ int main(int argc, char **argv) {
 				pthread_join(threads[i], (void **)&result);
 				total = MultModulo(total, result, mod);
 			}
-
 			printf("Total: %llu\n", total);
 
 			char buffer[sizeof(total)];
